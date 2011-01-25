@@ -17,4 +17,4 @@ def diagonal():
         else:
             return -pl.inf
 
-    return mc.Model(vars())
+    return mc.MCMC(vars())
