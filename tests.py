@@ -19,5 +19,6 @@ class TestClass:
         m1 = models.diagonal()
         m1.sample(10)
 
-        graphics.visualize_steps(m1.X, 5)
+        graphics.visualize_single_step(m1, 5, 0.)
+
 
