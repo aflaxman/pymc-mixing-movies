@@ -17,7 +17,7 @@ def uniform(step):
 def diagonal(step):
     """ create model for diagonal subset
 
-    step : str, one of 'AM', 'M', 'Hit'
+    step : str, one of 'Adaptive Metropolis', 'Metropolis', 'Hit-and-Run'
         
     """
     X = mc.Uniform('X', lower=-1., upper=1., value=[0., 0.])
@@ -48,15 +48,16 @@ def x_diagonal(step, iters=5000):
 
 def setup_and_sample(vars, step, iters=5000):
     mod = mc.MCMC(vars)
-    if step == 'AM':
+    if step == 'Adaptive Metropolis':
         mod.use_step_method(mc.AdaptiveMetropolis, mod.X)
-    elif step == 'Hit':
+    elif step == 'Hit-and-Run':
         import steppers
         reload(steppers)
         mod.use_step_method(steppers.HitAndRun, mod.X, proposal_sd=.1)
-    else:
+    elif step == 'Metropolis':
         mod.use_step_method(mc.Metropolis, mod.X)
-
+    else:
+        raise Exception, 'Unrecognized Step Method'
     mod.sample(iters)
 
     return mod
@@ -73,13 +74,14 @@ def make_uniform_examples():
     graphics.visualize_steps(m, 'uniform_AM.avi')
 
 def make_examples():
-    for step in ['AM', 'M', 'Hit']:
+    for step in ['Hit-and-Run', 'Adaptive Metropolis', 'Metropolis']:
         for model in [x_diagonal, diagonal]:
+            print step, model.__name__
             m = model(step)
-            graphics.visualize_steps(m, '%s_%s.avi' % (model.__name__, step))
+            graphics.visualize_steps(m, '%s_%s.avi' % (model.__name__, step[0]), step)
 
 if __name__ == '__main__':
-    m = x_diagonal('Hit')
+    m = x_diagonal('Hit-and-Run', 200)
     reload(graphics)
-    graphics.visualize_single_step(m, 1000, .5)
+    graphics.visualize_single_step(m, 101, .5, 'Hit-and-Run')
     pl.show()
