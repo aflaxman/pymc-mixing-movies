@@ -6,15 +6,18 @@ Let's have a look at what's going on.
 import pylab as pl
 import pymc as mc
 import graphics
+reload(graphics)
 
 inf = pl.inf
 
 # simple models for some uniformly distributed subsets of the plane
-def uniform(step):
-    X = mc.Uniform('X', lower=-1., upper=1., value=[0., 0.])
-    return setup_and_sample(vars(), step)
+def uniform(step='Metropolis', iters=5000):
+    X = mc.Uniform('X', lower=-1, upper=1, value=[0,0])
+    mod = setup_and_sample(vars(), step, iters)
+    mod.shape = pl.array([[-1,-1], [-1,1], [1,1], [1,-1]])
+    return mod
 
-def diagonal(step):
+def diagonal(step='Metropolis'):
     """ create model for diagonal subset
 
     step : str, one of 'Adaptive Metropolis', 'Metropolis', 'Hit-and-Run'
@@ -29,9 +32,11 @@ def diagonal(step):
         else:
             return -inf
 
-    return setup_and_sample(vars(), step)
+    mod = setup_and_sample(vars(), step)
+    mod.shape = pl.array([[-1,-1], [-1,-.9], [.9,1], [1,1], [1,.9], [-.9,-1], [-1,-1]])
+    return mod
 
-def x_diagonal(step, iters=5000):
+def x_diagonal(step='Metropolis', iters=5000):
     X = mc.Uniform('X', lower=-1., upper=1., value=[0., 0.])
 
     @mc.potential
@@ -43,7 +48,12 @@ def x_diagonal(step, iters=5000):
         else:
             return -inf
 
-    return setup_and_sample(vars(), step, iters)
+    mod = setup_and_sample(vars(), step, iters)
+    mod.shape = pl.array([[-1,-1], [-1,-.9], [-.1,  0], [ -1, .9],
+                          [-1, 1], [-.9, 1], [  0, .1], [ .9, 1],
+                          [ 1, 1], [ 1, .9], [ .1,  0], [  1,-.9],
+                          [ 1,-1], [.9, -1], [  0,-.1], [-.9,-1]])
+    return mod
 
 
 def setup_and_sample(vars, step, iters=5000):
@@ -62,26 +72,15 @@ def setup_and_sample(vars, step, iters=5000):
 
     return mod
 
-def make_uniform_examples():
-    m = mc.MCMC({'X': mc.Uniform('X', lower=-1, upper=1, value=[0,0])})
-    m.use_step_method(mc.Metropolis, m.X)
-    m.sample(3000)
-    graphics.visualize_steps(m, 'uniform_M.avi')
-
-    m = mc.MCMC({'X': mc.Uniform('X', lower=-1, upper=1, value=[0,0])})
-    m.use_step_method(mc.AdaptiveMetropolis, m.X)
-    m.sample(3000)
-    graphics.visualize_steps(m, 'uniform_AM.avi')
-
 def make_examples():
     for step in ['Hit-and-Run', 'Adaptive Metropolis', 'Metropolis']:
-        for model in [x_diagonal, diagonal]:
+        for model in [x_diagonal, diagonal, uniform]:
             print step, model.__name__
             m = model(step)
             graphics.visualize_steps(m, '%s_%s.avi' % (model.__name__, step[0]), step)
 
 if __name__ == '__main__':
-    m = x_diagonal('Hit-and-Run', 200)
-    reload(graphics)
-    graphics.visualize_single_step(m, 101, .5, 'Hit-and-Run')
-    pl.show()
+    make_examples()
+
+    #graphics.visualize_single_step(m, 101, .5, 'Hit-and-Run')
+

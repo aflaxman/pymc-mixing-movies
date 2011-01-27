@@ -5,7 +5,7 @@ don't want to
 import pylab as pl
 import sys
 
-def visualize_single_step(mod, i, alpha, description_str):
+def visualize_single_step(mod, i, alpha=0., description_str=''):
     """ Show how a random walk in a two dimensional space has
     progressed up to step i"""
 
@@ -24,6 +24,9 @@ def visualize_single_step(mod, i, alpha, description_str):
     pl.plot([Y[0], Y[0]], [Y[1], 2.], 'k-', alpha=.5)
     pl.plot([Y[0], 2], [Y[1], Y[1]], 'k-', alpha=.5)
     pl.plot(Y[0], Y[1], 'go')
+
+    if hasattr(mod, 'shape'):
+        pl.fill(mod.shape[:,0], mod.shape[:,1], color='b', alpha=.2)
 
     pl.axis([-1.1, 1.1, -1.1, 1.1])
     pl.xticks([])
