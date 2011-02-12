@@ -64,6 +64,10 @@ def setup_and_sample(vars, step, iters=5000):
         import steppers
         reload(steppers)
         mod.use_step_method(steppers.HitAndRun, mod.X, proposal_sd=.1)
+    elif step == 'H-RAM':
+        import steppers
+        reload(steppers)
+        mod.use_step_method(steppers.HRAM, mod.X, proposal_sd=.01)
     elif step == 'Metropolis':
         mod.use_step_method(mc.Metropolis, mod.X)
     else:
