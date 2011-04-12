@@ -11,9 +11,21 @@ class TestClass:
     def setUp(self):
         pass
 
+    def test_uniform_model(self):
+        m1 = models.uniform(iters=100)
+        graphics.visualize_single_step(m1, 99)
+
     def test_diagonal_model(self):
         m1 = models.diagonal('Metropolis')
-        assert hasattr(m1, 'X'), 'model should have stoch X as attribute'
+        graphics.visualize_single_step(m1, 99)
+
+    def test_x_diagonal_model(self):
+        m1 = models.x_diagonal(iters=100)
+        graphics.visualize_single_step(m1, 99)
+
+    def test_banana_model(self):
+        m1 = models.banana(iters=100)
+        graphics.visualize_single_step(m1, 99)
 
     def test_visualize_step_i(self):
         step = 'Adaptive Metropolis'
