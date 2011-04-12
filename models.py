@@ -78,7 +78,8 @@ def banana(dim=2, b=.03, step='Metropolis', iters=5000):
         return mc.normal_like(phi_X, 0., tau)
 
     mod = setup_and_sample(vars(), step, iters)
-    #mod.plot_distribution = show_banana
+    im = pl.imread('banana.png')
+    mod.plot_distribution = lambda: pl.imshow(im, extent=[-1,1,-1,1], aspect='auto', interpolation='bicubic')
     return mod
 
 

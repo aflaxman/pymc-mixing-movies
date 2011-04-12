@@ -27,6 +27,8 @@ def visualize_single_step(mod, i, alpha=0., description_str=''):
 
     if hasattr(mod, 'shape'):
         pl.fill(mod.shape[:,0], mod.shape[:,1], color='b', alpha=.2)
+    if hasattr(mod, 'plot_distribution'):
+        mod.plot_distribution()
 
     pl.axis([-1.1, 1.1, -1.1, 1.1])
     pl.xticks([])
