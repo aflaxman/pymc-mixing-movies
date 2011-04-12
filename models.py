@@ -17,7 +17,7 @@ def uniform(step='Metropolis', iters=5000):
     mod.shape = pl.array([[-1,-1], [-1,1], [1,1], [1,-1]])
     return mod
 
-def diagonal(step='Metropolis'):
+def diagonal(step='Metropolis', iters=5000):
     """ create model for diagonal subset
 
     step : str, one of 'Adaptive Metropolis', 'Metropolis', 'Hit-and-Run'
@@ -32,7 +32,7 @@ def diagonal(step='Metropolis'):
         else:
             return -inf
 
-    mod = setup_and_sample(vars(), step)
+    mod = setup_and_sample(vars(), step, iters)
     mod.shape = pl.array([[-1,-1], [-1,-.9], [.9,1], [1,1], [1,.9], [-.9,-1], [-1,-1]])
     return mod
 
