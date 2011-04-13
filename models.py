@@ -110,6 +110,13 @@ def make_examples():
             m = model(step)
             graphics.visualize_steps(m, '%s_%s.avi' % (model.__name__, step[0]), step)
 
+def make_bananas():
+    for step in ['Hit-and-Run', 'H-RAM', 'Adaptive Metropolis', 'Metropolis']:
+        for b in [.03, .1]:
+            print step, b
+            m = banana(b=b, step=step)
+            graphics.visualize_steps(m, 'banana_%.2f_%s.avi' % (b, step[0]), step)
+
 if __name__ == '__main__':
     make_examples()
 
