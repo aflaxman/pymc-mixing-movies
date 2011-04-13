@@ -121,11 +121,12 @@ def make_examples():
             graphics.visualize_steps(m, '%s_%s.avi' % (model.__name__, step[0]), step)
 
 def make_bananas():
-    for step in ['Hit-and-Run', 'H-RAM', 'Adaptive Metropolis', 'Metropolis']:
+    for step in ['Hit-and-Run', 'Adaptive Metropolis', 'Metropolis']:
         for b in [.03, .1]:
-            print step, b
-            m = banana(b=b, step=step)
-            graphics.visualize_steps(m, 'banana_%.2f_%s.avi' % (b, step[0]), step)
+            for dim in [2, 4, 8]:
+                print step, b, dim
+                m = banana(b=b, dim=dim, step=step)
+                graphics.visualize_steps(m, 'banana_b_%.2f_dim_%d_%s.avi' % (b, dim, step[0]), step)
 
 if __name__ == '__main__':
     make_examples()
