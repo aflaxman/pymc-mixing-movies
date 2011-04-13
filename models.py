@@ -102,6 +102,9 @@ def setup_and_sample(vars, step, iters=5000):
         import steppers
         reload(steppers)
         mod.use_step_method(steppers.HRAM, mod.X, proposal_sd=.01)
+#        import history_steps
+#        reload(history_steps)
+#        mod.use_step_method(history_steps.HRAM, mod.X, init_history=mc.rnormal(mod.X.value, .001**-2, size=(25, len(mod.X.value))), n_points=25)
     elif step == 'Metropolis':
         mod.use_step_method(mc.Metropolis, mod.X, proposal_sd=.01)
     else:
