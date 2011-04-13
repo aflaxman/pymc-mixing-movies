@@ -15,6 +15,8 @@ def uniform(step='Metropolis', iters=5000):
     X = mc.Uniform('X', lower=-1, upper=1, value=[0,0])
     mod = setup_and_sample(vars(), step, iters)
     mod.shape = pl.array([[-1,-1], [-1,1], [1,1], [1,-1]])
+    mod.true_mean = [0,0]
+    mod.true_iqr = ['(-.5,.5)', '(-.5,5)']
     return mod
 
 def diagonal(step='Metropolis', iters=5000):
@@ -34,6 +36,8 @@ def diagonal(step='Metropolis', iters=5000):
 
     mod = setup_and_sample(vars(), step, iters)
     mod.shape = pl.array([[-1,-1], [-1,-.9], [.9,1], [1,1], [1,.9], [-.9,-1], [-1,-1]])
+    mod.true_mean = [0,0]
+    mod.true_iqr = ['(-.5,.5)', '(-.5,5)']
     return mod
 
 def x_diagonal(step='Metropolis', iters=5000):
@@ -53,6 +57,8 @@ def x_diagonal(step='Metropolis', iters=5000):
                           [-1, 1], [-.9, 1], [  0, .1], [ .9, 1],
                           [ 1, 1], [ 1, .9], [ .1,  0], [  1,-.9],
                           [ 1,-1], [.9, -1], [  0,-.1], [-.9,-1]])
+    mod.true_mean = [0,0]
+    mod.true_iqr = ['(-.5,.5)', '(-.5,5)']
     return mod
 
 def banana(dim=2, b=.03, step='Metropolis', iters=5000):
@@ -80,6 +86,7 @@ def banana(dim=2, b=.03, step='Metropolis', iters=5000):
     mod = setup_and_sample(vars(), step, iters)
     im = pl.imread('banana.png')
     mod.plot_distribution = lambda: pl.imshow(im, extent=[-1,1,-1,1], aspect='auto', interpolation='bicubic')
+
     return mod
 
 

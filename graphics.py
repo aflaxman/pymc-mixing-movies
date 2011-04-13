@@ -52,38 +52,40 @@ def visualize_single_step(mod, i, alpha=0., description_str=''):
     pl.yticks([])
     pl.text(10, -1., '$X_1$')
 
-    ## show X[0] acorr
+    ## show X[i, j] acorr
+    N, D = X.shape
     if i > 100:
-        pl.axes([1-.1-sq_size, sq_size*2.+.01*3, sq_size*.5, sq_size*.5])
-        pl.acorr(X[:i:10, 0], detrend=pl.mlab.detrend_mean)
-        pl.xlabel('$X_0$')
-        pl.ylabel('autocorr')
-        pl.xticks([])
-        pl.yticks([])
-        pl.axis([-10, 10, -.1, 1])
+        for j in range(D):
+            pl.axes([1-.1-1.5*sq_size*(1-j*D**-1.), 1.-.1-1.5*sq_size*D**-1, 1.5*sq_size*D**-1., 1.5*sq_size*D**-1.])
+            pl.acorr(X[(i/2):i:10, j], detrend=pl.mlab.detrend_mean)
+            pl.xlabel('$X_%d$'%j)
+            if j == 0:
+                pl.ylabel('autocorr')
+            pl.xticks([])
+            pl.yticks([])
+            pl.axis([-10, 10, -.1, 1])
     ## show X[1] acorr
-    if i > 100:
-        pl.axes([1.-.1-sq_size*.5, sq_size*2+.01*3, sq_size*.5, sq_size*.5])
-        pl.acorr(X[:i:10, 1], detrend=pl.mlab.detrend_mean)
-        pl.xlabel('$X_1$')
-        pl.xticks([])
-        pl.yticks([])
-        pl.axis([-10, 10, -.1, 1])
 
     ## textual information
     str = ''
     str += 't = %d\n' % i
     str += 'acceptance rate = %.2f\n\n' % (1. - pl.mean(pl.diff(X[:i, 0]) == 0.))
-    #str += 'effective samples of X[0] = %.2f\n' % 0.
-    #str += 'effective samples of X[1] = %.2f\n' % 0.
-    str += 'mean(X) = (%.2f, %.2f) / true mean = (0, 0)\n' % tuple(X[:i, :].mean(0))
+
+    str += 'mean(X) = %s' % pretty_array(X[:i, :].mean(0))
+    if hasattr(mod, 'true_mean'):
+        str += ' / true mean = %s\n' % pretty_array(mod.true_mean)
+    else:
+        str += '\n'
 
     if i > 0:
         iqr = pl.sort(X[:i,:], axis=0)[[.25*i, .75*i], :].T
-    else:
-        iqr = pl.nan * pl.ones([2,2])
-    str += 'IQR(X[0]) = (%.2f, %.2f) / true IQR = (-.5, .5)\n' % tuple(iqr[0,:])
-    str += 'IQR(X[1]) = (%.2f, %.2f) / true IQR = (-.5, .5)\n' % tuple(iqr[1,:])
+
+        for j in range(D):
+            str += 'IQR(X[%d]) = (%.2f, %.2f)' % (j, iqr[j,0], iqr[j,1])
+            if hasattr(mod, 'true_iqr'):
+                str += ' / true IQR = %s\n' % mod.true_iqr[j]
+            else:
+                str += '\n'
     pl.figtext(.05 + .01 + sq_size, .05 + .01 + sq_size, str, va='bottom', ha='left')
 
     pl.figtext(sq_size + .5 * (1. - sq_size), .9, 
@@ -111,3 +113,6 @@ def visualize_steps(mod, fname='mod.avi', description_str=''):
     subprocess.call('mencoder mf://mod*.png -mf w=800:h=600 -ovc x264 -of avi -o %s' % fname, shell=True)
     subprocess.call('mplayer -loop 1 %s' % fname, shell=True)
     subprocess.call('rm mod*.png', shell=True)
+
+def pretty_array(x):
+    return '(%s)' % ', '.join('%.2f' % x_i for x_i in x)
