@@ -54,7 +54,7 @@ def visualize_single_step(mod, i, alpha=0., description_str=''):
 
     ## show X[i, j] acorr
     N, D = X.shape
-    if i > 100:
+    if i > 250:
         for j in range(D):
             pl.axes([1-.1-1.5*sq_size*(1-j*D**-1.), 1.-.1-1.5*sq_size*D**-1, 1.5*sq_size*D**-1., 1.5*sq_size*D**-1.])
             pl.acorr(X[(i/2):i:10, j], detrend=pl.mlab.detrend_mean)
