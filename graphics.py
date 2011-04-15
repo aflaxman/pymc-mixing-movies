@@ -69,16 +69,16 @@ def visualize_single_step(mod, i, alpha=0., description_str=''):
     ## textual information
     str = ''
     str += 't = %d\n' % i
-    str += 'acceptance rate = %.2f\n\n' % (1. - pl.mean(pl.diff(X[:i, 0]) == 0.))
+    str += 'acceptance rate = %.2f\n\n' % (1. - pl.mean(pl.diff(X[(i/2.):i, 0]) == 0.))
 
-    str += 'mean(X) = %s' % pretty_array(X[:i, :].mean(0))
+    str += 'mean(X) = %s' % pretty_array(X[(i/2.):i, :].mean(0))
     if hasattr(mod, 'true_mean'):
         str += ' / true mean = %s\n' % pretty_array(mod.true_mean)
     else:
         str += '\n'
 
-    if i > 0:
-        iqr = pl.sort(X[:i,:], axis=0)[[.25*i, .75*i], :].T
+    if i > 10:
+        iqr = pl.sort(X[(i/2.):i,:], axis=0)[[.25*i, .75*i], :].T
 
         for j in range(D):
             str += 'IQR(X[%d]) = (%.2f, %.2f)' % (j, iqr[j,0], iqr[j,1])
