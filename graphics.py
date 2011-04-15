@@ -57,7 +57,7 @@ def visualize_single_step(mod, i, alpha=0., description_str=''):
     if i > 250:
         for j in range(D):
             pl.axes([1-.1-1.5*sq_size*(1-j*D**-1.), 1.-.1-1.5*sq_size*D**-1, 1.5*sq_size*D**-1., 1.5*sq_size*D**-1.])
-            pl.acorr(X[(i/2):i:10, j], detrend=pl.mlab.detrend_mean)
+            pl.acorr(X[(i/2.):i:10, j], detrend=pl.mlab.detrend_mean)
             pl.xlabel('$X_%d$'%j)
             if j == 0:
                 pl.ylabel('autocorr')
@@ -88,7 +88,7 @@ def visualize_single_step(mod, i, alpha=0., description_str=''):
                 str += '\n'
     pl.figtext(.05 + .01 + sq_size, .05 + .01 + sq_size, str, va='bottom', ha='left')
 
-    pl.figtext(sq_size + .5 * (1. - sq_size), .9, 
+    pl.figtext(sq_size + .5 * (1. - sq_size), .96, 
                description_str, va='top', ha='center', size=32)
 
     pl.figtext(.95, .05, 'healthyalgorithms.wordpress.com', ha='right')
