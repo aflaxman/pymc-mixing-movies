@@ -75,38 +75,46 @@ def banana(dim=2, b=.03, step='Metropolis', iters=5000):
     C_1[0] = 100.
     X = mc.Uninformative('X', value=pl.zeros(dim))
 
-    @mc.potential
-    def banana(X=X, tau=C_1**-1, b=b):
+    def banana_like(X, tau, b):
         phi_X = pl.copy(X)
         phi_X *= 30. # rescale X to match scale of other models
         phi_X[1] = phi_X[1] + b*phi_X[0]**2 - 100*b
 
         return mc.normal_like(phi_X, 0., tau)
 
+    @mc.potential
+    def banana(X=X, tau=C_1**-1, b=b):
+        return banana_like(X, tau, b)
+
     mod = setup_and_sample(vars(), step, iters)
     im = pl.imread('banana.png')
-    mod.plot_distribution = lambda: pl.imshow(im, extent=[-1,1,-1,1], aspect='auto', interpolation='bicubic')
+    x = pl.arange(-1, 1, .01)
+    y = pl.arange(-1, 1, .01)
+    z = [[banana_like(pl.array([xi, yi]), C_1[[0,1]]**-1, b) for xi in x] for yi in y]
+    def plot_distribution():
+        pl.imshow(im, extent=[-1,1,-1,1], aspect='auto', interpolation='bicubic')
+        pl.contour(x, y, z, [-1000, -10, -6], cmap=pl.cm.Greys, alpha=.5)
+    mod.plot_distribution = plot_distribution
 
     return mod
 
 
+import steppers
+reload(steppers)
+import history_steps
+reload(history_steps)
+
 def setup_and_sample(vars, step, iters=5000):
     mod = mc.MCMC(vars)
-    if step == 'Adaptive Metropolis':
+    if step == 'AdaptiveMetropolis':
         mod.use_step_method(mc.AdaptiveMetropolis, mod.X)
     elif step == 'Hit-and-Run':
-        import steppers
-        reload(steppers)
         mod.use_step_method(steppers.HitAndRun, mod.X, proposal_sd=.1)
     elif step == 'H-RAM':
-        import steppers
-        reload(steppers)
-        mod.use_step_method(steppers.HRAM, mod.X, proposal_sd=.01)
-#        import history_steps
-#        reload(history_steps)
-#        mod.use_step_method(history_steps.HRAM, mod.X, init_history=mc.rnormal(mod.X.value, .001**-2, size=(25, len(mod.X.value))), n_points=25)
+        #mod.use_step_method(steppers.HRAM, mod.X, proposal_sd=.01)
+        mod.use_step_method(history_steps.HRAM, mod.X, init_history=mc.rnormal(mod.X.value, 1., size=(20, len(mod.X.value))), xprime_sds=2, xprime_n=51)
     elif step == 'Metropolis':
-        mod.use_step_method(mc.Metropolis, mod.X, proposal_sd=.01)
+        mod.use_step_method(mc.Metropolis, mod.X, proposal_sd=.1)
     else:
         raise Exception, 'Unrecognized Step Method'
     mod.sample(iters)
@@ -114,19 +122,19 @@ def setup_and_sample(vars, step, iters=5000):
     return mod
 
 def make_examples():
-    for step in ['Hit-and-Run', 'Adaptive Metropolis', 'Metropolis']:
+    for step in ['Hit-and-Run', 'AdaptiveMetropolis', 'Metropolis']:
         for model in [x_diagonal, diagonal, uniform]:
             print step, model.__name__
             m = model(step)
             graphics.visualize_steps(m, '%s_%s.avi' % (model.__name__, step[0]), step)
 
 def make_bananas():
-    for step in ['Hit-and-Run', 'Adaptive Metropolis', 'Metropolis']:
-        for b in [.03, .1]:
+    for step in ['H-RAM', 'Hit-and-Run', 'AdaptiveMetropolis', 'Metropolis']:
+        for b in [0., .03, .1]:
             for dim in [2, 4, 8]:
                 print step, b, dim
                 m = banana(b=b, dim=dim, step=step)
-                graphics.visualize_steps(m, 'banana_b_%.2f_dim_%d_%s.avi' % (b, dim, step[0]), step)
+                graphics.visualize_steps(m, 'banana_b_%.2f_dim_%d_%s.avi' % (b, dim, step), step)
 
 if __name__ == '__main__':
     make_examples()

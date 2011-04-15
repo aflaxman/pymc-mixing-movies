@@ -28,7 +28,7 @@ class TestClass:
         graphics.visualize_single_step(m1, 99)
 
     def test_visualize_step_i(self):
-        step = 'Adaptive Metropolis'
+        step = 'AdaptiveMetropolis'
         m1 = models.x_diagonal(step)
         graphics.visualize_single_step(m1, 5, 0., step)
 
