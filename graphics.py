@@ -78,7 +78,7 @@ def visualize_single_step(mod, i, alpha=0., description_str=''):
         str += '\n'
 
     if i > 10:
-        iqr = pl.sort(X[(i/2.):i,:], axis=0)[[.25*i, .75*i], :].T
+        iqr = pl.sort(X[(i/2.):i,:], axis=0)[[.25*(i/2.), .75*(i/2.)], :].T
 
         for j in range(D):
             str += 'IQR(X[%d]) = (%.2f, %.2f)' % (j, iqr[j,0], iqr[j,1])
